@@ -3,9 +3,11 @@
 A Spring Boot based online bookstore web application.
 
 ## Technologies Used
-- Java Spring Boot
+- Java
+- Spring Boot
 - Maven
-- HTML, CSS
+- HTML
+- CSS
 
 ## How to Run
 1. Clone the repository

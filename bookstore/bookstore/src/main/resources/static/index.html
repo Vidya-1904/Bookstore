@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GraspMaster</title>
+
+<style>
+
+:root{
+--bg:#f3f3f3;
+--text:black;
+--card:white;
+}
+
+.dark{
+--bg:#131921;
+--text:white;
+--card:#1f2a38;
+}
+
+body{
+margin:0;
+font-family:Arial;
+background:var(--bg);
+color:var(--text);
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:#131921;
+color:white;
+padding:10px 20px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.logo img{
+height:40px;
+}
+
+.search{
+width:40%;
+padding:8px;
+border:none;
+border-radius:5px;
+}
+
+.right{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.user-area a{
+background:#ffd814;
+padding:6px 12px;
+border-radius:6px;
+text-decoration:none;
+color:black;
+font-weight:bold;
+}
+
+.user-area button{
+background:#ff4d4d;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* CART */
+
+.cart{
+position:relative;
+cursor:pointer;
+font-size:22px;
+}
+
+.badge{
+position:absolute;
+top:-8px;
+right:-10px;
+background:red;
+color:white;
+border-radius:50%;
+padding:3px 7px;
+font-size:12px;
+}
+
+/* GRID */
+
+.container{
+padding:20px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+}
+
+/* CARD */
+
+.card{
+position:relative;
+background:var(--card);
+padding:15px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 2px 6px rgba(0,0,0,.1);
+transition:0.2s;
+}
+
+.card:hover{
+transform:scale(1.03);
+}
+
+.card img{
+height:200px;
+width:140px;
+object-fit:cover;
+border-radius:8px;
+}
+
+/* BEST SELLER */
+
+.badge-book{
+position:absolute;
+top:10px;
+left:10px;
+background:#e41f11;
+color:white;
+padding:4px 8px;
+border-radius:5px;
+font-size:12px;
+font-weight:bold;
+}
+
+/* PRICE */
+
+.price{
+color:#b12704;
+font-weight:bold;
+font-size:20px;
+}
+
+/* BUTTON */
+
+button{
+background:#ffd814;
+border:none;
+padding:8px 12px;
+margin-top:8px;
+cursor:pointer;
+border-radius:6px;
+font-weight:bold;
+}
+
+.review-btn{
+background:#232f3e;
+color:white;
+margin-left:5px;
+}
+
+/* RATING */
+
+.rating{
+color:#f0a500;
+font-weight:bold;
+margin:8px 0;
+}
+
+/* TOAST */
+
+.toast{
+position:fixed;
+bottom:20px;
+right:20px;
+background:green;
+color:white;
+padding:12px 18px;
+border-radius:8px;
+display:none;
+z-index:999;
+}
+
+/* REVIEW MODAL */
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.modal-box{
+background:white;
+width:650px;
+max-width:95%;
+max-height:85vh;
+overflow:auto;
+padding:25px;
+border-radius:15px;
+}
+
+.dark .modal-box{
+background:#1f2a38;
+color:white;
+}
+
+.close-btn{
+float:right;
+background:red;
+color:white;
+}
+
+.review-item{
+padding:15px 0;
+border-bottom:1px solid #ccc;
+}
+
+.review-user{
+font-weight:bold;
+}
+
+.review-stars{
+color:#f0a500;
+margin:5px 0;
+}
+
+.review-date{
+font-size:12px;
+color:gray;
+}
+
+.review-form{
+margin-top:20px;
+}
+
+.star-select span{
+font-size:28px;
+cursor:pointer;
+}
+
+textarea{
+width:100%;
+height:90px;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+}
+
+.delete-btn{
+background:#ff4d4d;
+color:white;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="logo">
+<img id="logo" src="logoNO.png">
+<h2>GraspMaster</h2>
+</div>
+
+<input class="search"
+placeholder="Search books..."
+onkeyup="searchBooks(this.value)">
+
+<div class="right">
+
+<div id="userArea" class="user-area"></div>
+
+<div class="cart" onclick="goCart()">
+🛒
+<span class="badge" id="count">0</span>
+</div>
+
+<button onclick="toggleTheme()">🌙</button>
+
+</div>
+</div>
+
+<div class="container" id="books"></div>
+
+<div class="toast" id="toast">
+Added to Cart ✅
+</div>
+
+<!-- REVIEW MODAL -->
+
+<div class="modal" id="reviewModal">
+
+<div class="modal-box">
+
+<button class="close-btn" onclick="closeReviews()">
+✖
+</button>
+
+<h2 id="reviewTitle"></h2>
+
+<div id="reviewList"></div>
+
+<div class="review-form">
+
+<h3>Add Your Review</h3>
+
+<div id="starSelect" class="star-select">
+<span onclick="pickStar(1)">☆</span>
+<span onclick="pickStar(2)">☆</span>
+<span onclick="pickStar(3)">☆</span>
+<span onclick="pickStar(4)">☆</span>
+<span onclick="pickStar(5)">☆</span>
+</div>
+
+<textarea
+id="reviewInput"
+placeholder="Write your review..."
+></textarea>
+
+<button onclick="submitReview()">
+Submit Review
+</button>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+let allBooks=[];
+let currentBook="";
+let selectedStars=5;
+
+/* THEME */
+
+let dark=localStorage.getItem("theme")==="dark";
+
+if(dark){
+document.body.classList.add("dark");
+document.getElementById("logo").src="logoBW.png";
+}
+
+function toggleTheme(){
+
+dark=!dark;
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+"theme",
+dark?"dark":"light"
+);
+
+document.getElementById("logo").src=
+dark?"logoBW.png":"logoNO.png";
+}
+
+/* LOGIN */
+
+function checkLogin(){
+
+let loggedIn=
+localStorage.getItem("loggedIn");
+
+if(loggedIn==="true"){
+
+let user=
+localStorage.getItem("currentUser");
+
+document.getElementById("userArea").innerHTML=
+`👤 <b>${user}</b>
+<button onclick='logout()'>Logout</button>`;
+
+}else{
+
+document.getElementById("userArea").innerHTML=
+`<a href='login.html'>Login</a>`;
+}
+}
+
+function logout(){
+
+localStorage.removeItem("loggedIn");
+localStorage.removeItem("currentUser");
+
+location.reload();
+}
+
+checkLogin();
+
+/* FETCH BOOKS */
+
+fetch('/books')
+.then(r=>r.json())
+.then(data=>{
+
+allBooks=data;
+
+displayBooks(data);
+
+});
+
+/* DISPLAY BOOKS */
+
+function displayBooks(books){
+
+let html='';
+
+books.forEach(b=>{
+
+let rating=(Math.random()*1+4).toFixed(1);
+
+html+=`
+
+<div class='card'>
+
+${rating>=4.8 ?
+'<div class="badge-book">Best Seller</div>' : ''}
+
+<img src='${b.image}'>
+
+<h3>${b.title}</h3>
+
+<p>${b.author}</p>
+
+<p class='rating'>
+⭐ ${rating}
+</p>
+
+<p class='price'>
+₹${b.price}
+</p>
+
+<button onclick='addToCart(${b.id})'>
+Add to Cart
+</button>
+
+<button class='review-btn'
+onclick="openReviews('${b.title}')">
+Reviews
+</button>
+
+</div>
+`;
+});
+
+document.getElementById("books").innerHTML=html;
+}
+
+/* SEARCH */
+
+function searchBooks(text){
+
+let filtered=
+allBooks.filter(
+b=>b.title.toLowerCase()
+.includes(text.toLowerCase())
+);
+
+displayBooks(filtered);
+}
+
+/* CART */
+
+function addToCart(id){
+
+let loggedIn=
+localStorage.getItem("loggedIn");
+
+if(loggedIn!=="true"){
+
+showToast("Login Required!");
+
+setTimeout(()=>{
+location.href="login.html";
+},1000);
+
+return;
+}
+
+let book=
+allBooks.find(b=>b.id===id);
+
+let cart=
+JSON.parse(localStorage.getItem("cart"))||[];
+
+let existing=
+cart.find(b=>b.id===id);
+
+if(existing){
+existing.qty++;
+}else{
+book.qty=1;
+cart.push(book);
+}
+
+localStorage.setItem(
+"cart",
+JSON.stringify(cart)
+);
+
+updateCart();
+
+showToast("Added to Cart ✅");
+}
+
+/* UPDATE CART */
+
+function updateCart(){
+
+let cart=
+JSON.parse(localStorage.getItem("cart"))||[];
+
+let count=
+cart.reduce((s,b)=>s+(b.qty||1),0);
+
+document.getElementById("count").innerText=count;
+}
+
+/* NAVIGATION */
+
+function goCart(){
+location.href="cart.html";
+}
+
+/* TOAST */
+
+function showToast(msg){
+
+let t=document.getElementById("toast");
+
+t.innerText=msg;
+
+t.style.display="block";
+
+setTimeout(()=>{
+t.style.display="none";
+},1500);
+}
+
+/* REVIEWS */
+
+let users=[
+"Rahul","Sneha","Arjun","Meera",
+"Varun","Pooja","Kiran","Ananya",
+"Ritika","Harsha"
+];
+
+let comments=[
+"Amazing book!",
+"Must read for everyone.",
+"Loved the characters.",
+"Very inspiring.",
+"Fantastic storytelling.",
+"Worth every rupee.",
+"Could not stop reading.",
+"Beautifully written."
+];
+
+function getReviews(book){
+
+let saved=
+JSON.parse(localStorage.getItem("reviews_"+book));
+
+if(saved){
+return saved;
+}
+
+let arr=[];
+
+for(let i=0;i<5;i++){
+
+arr.push({
+user:users[Math.floor(Math.random()*users.length)],
+stars:Math.floor(Math.random()*2)+4,
+text:comments[Math.floor(Math.random()*comments.length)],
+date:new Date().toLocaleDateString()
+});
+}
+
+localStorage.setItem(
+"reviews_"+book,
+JSON.stringify(arr)
+);
+
+return arr;
+}
+
+function openReviews(book){
+
+currentBook=book;
+
+document.getElementById(
+"reviewModal"
+).style.display="flex";
+
+document.getElementById(
+"reviewTitle"
+).innerText=book+" Reviews";
+
+renderReviews();
+}
+
+function closeReviews(){
+
+document.getElementById(
+"reviewModal"
+).style.display="none";
+}
+
+function renderReviews(){
+
+let reviews=getReviews(currentBook);
+
+let html='';
+
+reviews.forEach((r,i)=>{
+
+html+=`
+
+<div class='review-item'>
+
+<div class='review-user'>
+👤 ${r.user}
+</div>
+
+<div class='review-stars'>
+${"★".repeat(r.stars)}
+${"☆".repeat(5-r.stars)}
+</div>
+
+<div class='review-date'>
+${r.date}
+</div>
+
+<p>${r.text}</p>
+
+<button class='delete-btn'
+onclick='deleteReview(${i})'>
+Delete
+</button>
+
+</div>
+`;
+});
+
+document.getElementById(
+"reviewList"
+).innerHTML=html;
+}
+
+/* STAR PICK */
+
+function pickStar(n){
+
+selectedStars=n;
+
+let stars=
+document.querySelectorAll(
+"#starSelect span"
+);
+
+stars.forEach((s,i)=>{
+s.innerText=i<n?"★":"☆";
+});
+}
+
+/* SUBMIT REVIEW */
+
+function submitReview(){
+
+let text=
+document.getElementById("reviewInput")
+.value.trim();
+
+if(text===""){
+alert("Write review first");
+return;
+}
+
+let reviews=getReviews(currentBook);
+
+let user=
+localStorage.getItem("currentUser")
+|| "Guest";
+
+reviews.unshift({
+user:user,
+stars:selectedStars,
+text:text,
+date:new Date().toLocaleDateString()
+});
+
+localStorage.setItem(
+"reviews_"+currentBook,
+JSON.stringify(reviews)
+);
+
+document.getElementById(
+"reviewInput"
+).value="";
+
+renderReviews();
+}
+
+/* DELETE REVIEW */
+
+function deleteReview(index){
+
+let reviews=getReviews(currentBook);
+
+reviews.splice(index,1);
+
+localStorage.setItem(
+"reviews_"+currentBook,
+JSON.stringify(reviews)
+);
+
+renderReviews();
+}
+
+pickStar(5);
+
+updateCart();
+
+</script>
+
+</body>
+</html>

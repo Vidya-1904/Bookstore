@@ -8,8 +8,9 @@ public class Book {
     private String image;
     private double rating;
     private int reviewCount;
+    private String description;
 
-    public Book(int id, String title, String author, double price, String image, double rating, int reviewCount) {
+    public Book(int id, String title, String author, double price, String image, double rating, int reviewCount, String description) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -17,6 +18,7 @@ public class Book {
         this.image = image;
         this.rating = rating;
         this.reviewCount = reviewCount;
+        this.description = description;
     }
 
     public int getId() { return id; }
@@ -26,4 +28,5 @@ public class Book {
     public String getImage() { return image; }
     public double getRating() { return rating; }
     public int getReviewCount() { return reviewCount; }
+    public String getDescription() { return description; }
 }

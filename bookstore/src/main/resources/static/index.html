@@ -417,11 +417,13 @@ ${rating>=4.8 ?
 
 <p>${b.author}</p>
 
-<p style='font-size:12px; color:gray; margin:6px 0; line-height:1.4;
+<p id='desc-${b.id}' style='font-size:12px; color:gray; margin:6px 0; line-height:1.4;
           display:-webkit-box; -webkit-line-clamp:3;
           -webkit-box-orient:vertical; overflow:hidden;'>
 ${b.description}
 </p>
+<span style='font-size:12px; color:#007185; cursor:pointer; font-weight:bold;'
+onclick="toggleDesc(${b.id}, this)">more...</span>
 
 <p class='rating'>
 ⭐ ${rating}
@@ -444,6 +446,21 @@ Reviews
 `;
 });
 document.getElementById("books").innerHTML=html;
+}
+
+/* MORE / LESS TOGGLE */
+
+function toggleDesc(id, el){
+let p = document.getElementById('desc-'+id);
+if(el.innerText === 'more...'){
+p.style.display = 'block';
+p.style.webkitLineClamp = 'unset';
+el.innerText = 'less';
+} else {
+p.style.display = '-webkit-box';
+p.style.webkitLineClamp = '3';
+el.innerText = 'more...';
+}
 }
 
 /* SEARCH */
